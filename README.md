@@ -19,7 +19,7 @@ This bot automates form submissions, making it perfect for repetitive tasks like
 ---
 
 ## Requirements
-
+##You Need to CHange Stuff to fit With Your Form##
 Before running the bot, ensure you have the following installed:
 
 1. **Python 3.x**
@@ -93,21 +93,18 @@ Before running the bot, ensure you have the following installed:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/Adam-ZS/Microsoft-Forms-Fill-Bot.git
+   cd Microsoft-Forms-Fill-Bot
+   
+Update the Script
 
-# Example: Fill a form with random data
-def auto_fill_form(driver):
-    fields = driver.find_elements(By.XPATH, "//input | //textarea | //select")
-    for field in fields:
-        try:
-            field_type = field.get_attribute("type")
-            if field_type == "text":
-                field.send_keys("Random Text")
-            elif field_type == "number":
-                field.send_keys(str(random.randint(1, 100)))
-        except Exception as e:
-            print(f"Error filling field: {e}")
+Open the script (Form.py) in a text editor.
 
-This structure provides a clear and concise overview of your bot, making it easy for users to understand and use. Let me know if you need further adjustments! 😊
-New chat
+Update the geckodriver_path variable with the path to your Geckodriver executable.
+
+       geckodriver_path = "/path/to/geckodriver"  # Update this path to yours
+       
+To find yours
+
+      sudo find / -name "geckodriver"
+
