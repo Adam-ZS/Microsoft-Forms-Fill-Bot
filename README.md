@@ -19,13 +19,22 @@ This bot automates form submissions, making it perfect for repetitive tasks like
 ---
 
 ## Requirements
-##You Need to CHange Stuff to fit With Your Form##
-Before running the bot, ensure you have the following installed:
 
-1. **Python 3.x**
-2. **Selenium**
-3. **Geckodriver**
-4. **Firefox Browser**
+
+Before running the bot, ensure you done this
+
+#### -- You Need to CHange Stuff to fit With Your Form 
+#### -- You Need To Remove The Start Now Button Temporary 
+
+![image](https://github.com/user-attachments/assets/fbbfc313-3bcf-4171-be06-33a21ba303e2)
+
+# How to?
+#### Go to The form > Style > LeftTop Layout
+
+![image](https://github.com/user-attachments/assets/8455b0ed-b034-41a9-b4d5-daa8a63c0d98)
+
+### Once You finished, you can return it back!
+
 
 ---
 
