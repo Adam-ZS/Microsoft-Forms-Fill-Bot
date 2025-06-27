@@ -1,7 +1,7 @@
 # Microsoft-Forms-Fill-Bot
 Automate your form submissions effortlessly! This bot fills out forms for you, saves time, and ensures accuracy—perfect for surveys, registrations, and more. Try it now and let the bot do the work!
 
-### Would be very helpfull for Pojects
+### Would be very helpfull for Projects
 ### If facing any issues! either contact me or *Ask ChaGPT*!
 
 # Form Automation Bot
