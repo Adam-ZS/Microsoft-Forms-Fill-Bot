@@ -1,190 +1,366 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
-import time
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.firefox import GeckoDriverManager
+from selenium.common.exceptions import StaleElementReferenceException
 import random
+import time
 
-# ====================================================================================
-# HOW TO USE THIS SCRIPT:
-# 1. Install Selenium: Run `pip install selenium` in your terminal.
-# 2. Download Geckodriver: Get it from https://github.com/mozilla/geckodriver/releases.
-# 3. Update the code below to match your form:
-#    - Change the XPath for the "Submit" button if needed.
-#    - Add or modify fields in the `auto_fill_form` function.
-#    - Update the lists of names, brands, etc., if necessary.
-# 4. Run the script: `python Form.py`
-# ====================================================================================
+parrot = r"""
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                 MICROSOFT FORMS AUTO FILLER v1.0                   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-# Message for users about the "Start Now" button
-print("Important: If your form has a 'Start Now' button, remove it by going to the form >")
-print("1. Open the form in edit mode.")
-print("2. Click on the 'Style' tab.")
-print("3. Select the 'Top Left' layout option.")
-print("4. Save your changes.\n")
+ █████╗ ██████╗  █████╗ ███╗   ███╗      ███████╗███████╗
+██╔══██╗██╔══██╗██╔══██╗████╗ ████║      ╚══███╔╝██╔════╝
+███████║██║  ██║███████║██╔████╔██║        ███╔╝ ███████╗
+██╔══██║██║  ██║██╔══██║██║╚██╔╝██║       ███╔╝  ╚════██║
+██║  ██║██████╔╝██║  ██║██║ ╚═╝ ██║      ███████╗███████║
+╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝      ╚══════╝╚══════╝
 
-# Lists of names for random selection
-male_names = ["Ahmed", "Mohamed", "Ali", "Omar", "Youssef", "Abdul", "Hassan", "Hussein", "Ibrahim", "Khalid"]
-female_names = ["Fatima", "Aisha", "Layla", "Zainab", "Mariam", "Nadia", "Leila", "Rania", "Yara", "Ananya"]
 
-# Function to randomly select a name based on gender
-def get_random_name(gender):
-    if gender == "Male":
-        return random.choice(male_names)
-    else:
-        return random.choice(female_names)
+     __  __ _                     __            __
+    /  |/  (_)___________  ______/ /_____  ____/ /_
+   / /|_/ / / ___/ ___/ / / / __  / __ \/ __  / /
+  / /  / / / /__/ /  / /_/ / /_/ / /_/ / /_/ / /
+ /_/  /_/_/\___/_/   \__,_/\__,_/\____/\__,_/_/
 
-# Function to randomly select a gender
-def get_random_gender():
-    return random.choice(["Male", "Female"])
+                Forms Automation Suite
+                   by Adam-ZS
+"""
 
-# Function to randomly select an age between 15 and 25
-def get_random_age():
-    return random.randint(15, 25)
+# ============================================
+# CONFIG
+# ============================================
 
-# Function to randomly select a phone type
-def get_random_phone_type():
-    return random.choice(["iPhone", "Android", "Feature Phone"])
+GLOBAL_EXCLUSIONS = [
+    "other",
+    "medical",
+    "__other_option__",
+    "اخرى",
+    "أخرى"
+]
 
-# Function to randomly select a favorite smartphone brand
-def get_random_favorite_brand():
-    return random.choice(["Apple", "Samsung", "Huawei", "Xiaomi", "Oppo"])
+TEXT_RESPONSES = [
+    "Good",
+    "Excellent",
+    "Yes",
+    "No",
+    "N/A",
+    "Perfect",
+    "Okay",
+    "Agree",
+    "Strongly agree",
+    "Everything is fine",
+    "Very good",
+    "Satisfied",
+    "Nice",
+    "Thank you"
+]
 
-# Function to randomly select a primary reason for using a phone
-def get_random_reason():
-    return random.choice(["Communication", "Entertainment", "Work", "Social Media"])
+# ============================================
+# RANDOM TEXT
+# ============================================
 
-# Function to randomly select a place where the phone is used the most
-def get_random_place():
-    return random.choice(["Home", "Work", "Public Places", "School"])
+def random_text():
+    return random.choice(TEXT_RESPONSES)
 
-# Function to randomly select a frequently used mobile application
-def get_random_app():
-    return random.choice(["WhatsApp", "Instagram", "TikTok", "Facebook", "Snapchat"])
+# ============================================
+# FILL MICROSOFT FORM
+# ============================================
 
-# Function to randomly select the number of social media apps installed
-def get_random_social_media_apps():
-    return random.randint(1, 10)
+def fill_microsoft_form(driver, form_url):
 
-# Function to randomly select the number of phones owned
-def get_random_phones_owned():
-    return random.randint(1, 3)
-
-# Function to randomly select the number of times the phone is checked per day
-def get_random_phone_checks():
-    return random.randint(10, 100)
-
-# Function to randomly select the storage used on the phone (realistic sizes)
-def get_random_storage_used():
-    return random.choice([16, 32, 64, 128, 256, 512, 1024])
-
-# Function to randomly select the number of years using a smartphone
-def get_random_years_using_smartphone():
-    return random.randint(1, 10)
-
-# Function to automatically fill out the form
-def auto_fill_form(driver):
-    time.sleep(3)  # Wait for the form to load
-    fields = driver.find_elements(By.XPATH, "//input | //textarea | //select")  # Find all form fields
-
-    for field in fields:
-        try:
-            field_type = field.get_attribute("type")  # Get the type of the field (text, number, etc.)
-            field_name = field.get_attribute("name") or field.get_attribute("aria-label") or "Unknown Field"  # Get the field name
-
-            # Handle text fields
-            if field_type == "text" or field_type is None:
-                field.clear()  # Clear the field before filling it
-                if "name" in field_name.lower():
-                    field.send_keys(get_random_name(get_random_gender()))  # Fill with a random name
-                elif "age" in field_name.lower():
-                    field.send_keys(str(get_random_age()))  # Fill with a random age
-                elif "phone" in field_name.lower():
-                    field.send_keys(get_random_phone_type())  # Fill with a random phone type
-                elif "brand" in field_name.lower():
-                    field.send_keys(get_random_favorite_brand())  # Fill with a random brand
-                elif "reason" in field_name.lower():
-                    field.send_keys(get_random_reason())  # Fill with a random reason
-                elif "place" in field_name.lower():
-                    field.send_keys(get_random_place())  # Fill with a random place
-                elif "app" in field_name.lower():
-                    field.send_keys(get_random_app())  # Fill with a random app
-                elif "storage" in field_name.lower():
-                    field.send_keys(str(get_random_storage_used()))  # Fill with a random storage size
-                elif "years" in field_name.lower():
-                    field.send_keys(str(get_random_years_using_smartphone()))  # Fill with random years
-                else:
-                    field.send_keys("Random Text")  # Default text for unknown fields
-
-            # Handle number fields
-            elif field_type == "number":
-                field.clear()
-                field.send_keys(str(random.randint(1, 100)))  # Fill with a random number
-
-            # Handle radio buttons
-            elif field_type == "radio":
-                if not field.is_selected():
-                    field.click()  # Select the radio button if not already selected
-
-            # Handle checkboxes
-            elif field_type == "checkbox":
-                if random.choice([True, False]):
-                    field.click()  # Randomly check or uncheck the checkbox
-
-            # Handle date fields
-            elif field_type == "date":
-                field.clear()
-                field.send_keys("2023-10-15")  # Fill with a fixed date (adjust as needed)
-
-            # Handle dropdowns
-            elif field.tag_name == "select":
-                options = field.find_elements(By.TAG_NAME, "option")
-                if options:
-                    random.choice(options).click()  # Select a random option from the dropdown
-        except Exception as e:
-            print(f"Error filling field {field_name}: {e}")
-
-# Configure Firefox options (run in headless mode)
-firefox_options = Options()
-firefox_options.headless = True  # Run without opening a browser window
-firefox_options.add_argument("--disable-gpu")  # Disable GPU for headless mode
-
-# Path to Geckodriver (update this to your Geckodriver path)
-geckodriver_path = "/usr/local/bin/geckodriver"  # Replace with the actual path
-
-# Initialize the Firefox WebDriver
-try:
-    driver = webdriver.Firefox(service=Service(geckodriver_path), options=firefox_options)
-except Exception as e:
-    print(f"Error initializing WebDriver: {e}")
-    exit(1)
-
-# Ask the user for the form URL and number of submissions
-form_url = input("Enter the form URL: ")
-num_submissions = int(input("How many times do you want to fill the form? "))
-
-# Start filling the form
-for i in range(num_submissions):
     try:
-        driver.get(form_url)  # Open the form URL
-        time.sleep(5)  # Wait for the form to load
-        auto_fill_form(driver)  # Fill out the form
+        driver.get(form_url)
 
-        # Submit the form
-        try:
-            submit_button = driver.find_element(By.XPATH, "//button[text()='Submit']")  # Find the submit button
-            submit_button.click()  # Click the submit button
-            print(f"Form submitted successfully! ({i + 1}/{num_submissions})")
-        except Exception as e:
-            print(f"Error submitting form: {e}")
+        time.sleep(3)
 
-        # Clear cookies and refresh the page to reset the form
-        driver.delete_all_cookies()
-        driver.refresh()
+        while True:
+
+            questions = driver.find_elements(
+                By.CSS_SELECTOR,
+                "div[data-automation-id='questionItem']"
+            )
+
+            for q in questions:
+
+                try:
+
+                    # ====================================
+                    # RADIO BUTTONS
+                    # ====================================
+
+                    radios = q.find_elements(
+                        By.CSS_SELECTOR,
+                        "input[type='radio']"
+                    )
+
+                    if radios:
+
+                        unchecked = [
+                            r for r in radios
+                            if not r.is_selected()
+                        ]
+
+                        if unchecked:
+
+                            selected = random.choice(unchecked)
+
+                            driver.execute_script(
+                                "arguments[0].click();",
+                                selected
+                            )
+
+                            time.sleep(0.1)
+
+                    # ====================================
+                    # CHECKBOXES
+                    # ====================================
+
+                    checkboxes = q.find_elements(
+                        By.CSS_SELECTOR,
+                        "input[type='checkbox']"
+                    )
+
+                    if checkboxes:
+
+                        valid = []
+
+                        for cb in checkboxes:
+
+                            value = (
+                                cb.get_attribute("value") or ""
+                            ).lower()
+
+                            if not any(
+                                ex in value
+                                for ex in GLOBAL_EXCLUSIONS
+                            ):
+                                valid.append(cb)
+
+                        if valid:
+
+                            count = random.randint(
+                                1,
+                                min(3, len(valid))
+                            )
+
+                            picks = random.sample(valid, count)
+
+                            for cb in picks:
+
+                                driver.execute_script(
+                                    "arguments[0].click();",
+                                    cb
+                                )
+
+                                time.sleep(0.1)
+
+                    # ====================================
+                    # TEXT INPUTS
+                    # ====================================
+
+                    text_inputs = q.find_elements(
+                        By.CSS_SELECTOR,
+                        "textarea, input[type='text']"
+                    )
+
+                    for txt in text_inputs:
+
+                        current = txt.get_attribute("value")
+
+                        if not current:
+
+                            txt.send_keys(random_text())
+
+                            time.sleep(0.05)
+
+                except StaleElementReferenceException:
+                    continue
+
+                except Exception:
+                    continue
+
+            # ====================================
+            # NEXT BUTTON
+            # ====================================
+
+            try:
+
+                next_buttons = driver.find_elements(
+                    By.XPATH,
+                    "//button[contains(., 'Next')]"
+                )
+
+                if next_buttons:
+
+                    next_btn = next_buttons[0]
+
+                    if next_btn.is_displayed():
+
+                        driver.execute_script(
+                            "arguments[0].click();",
+                            next_btn
+                        )
+
+                        time.sleep(2)
+
+                        continue
+
+            except:
+                pass
+
+            # ====================================
+            # SUBMIT BUTTON
+            # ====================================
+
+            try:
+
+                submit_buttons = driver.find_elements(
+                    By.XPATH,
+                    "//button[contains(., 'Submit')]"
+                )
+
+                if submit_buttons:
+
+                    submit_btn = submit_buttons[0]
+
+                    if submit_btn.is_displayed():
+
+                        driver.execute_script(
+                            "arguments[0].click();",
+                            submit_btn
+                        )
+
+                        return True
+
+            except:
+                pass
+
+            break
+
+        return False
+
     except Exception as e:
-        print(f"Error during submission {i + 1}: {e}")
-        driver.refresh()
-        continue
 
-# Close the browser
-driver.quit()
+        print(f"❌ Error: {e}")
+
+        return False
+
+# ============================================
+# MAIN
+# ============================================
+
+def run_automation():
+
+    print(parrot)
+
+    print("=" * 50)
+    print("Microsoft Forms Auto Filler")
+    print("=" * 50)
+
+    form_url = input("\n📋 Enter Microsoft Form URL: ").strip()
+
+    num_submissions = int(
+        input("🔢 Number of submissions: ")
+    )
+
+    # ====================================
+    # FIREFOX OPTIONS
+    # ====================================
+
+    options = Options()
+
+    options.add_argument("--headless")
+
+    options.add_argument("--width=1200")
+
+    options.add_argument("--height=1000")
+
+    options.add_argument("--disable-gpu")
+
+    options.add_argument("--no-sandbox")
+
+    # ====================================
+    # DRIVER
+    # ====================================
+
+    driver = webdriver.Firefox(
+        service=Service(
+            GeckoDriverManager().install()
+        ),
+        options=options
+    )
+
+    total = 0
+
+    start_time = time.time()
+
+    print("\n🚀 Starting...\n")
+
+    for i in range(num_submissions):
+
+        print(
+            f"📝 Submission {i+1}/{num_submissions}"
+        )
+
+        success = fill_microsoft_form(
+            driver,
+            form_url
+        )
+
+        if success:
+
+            try:
+
+                WebDriverWait(driver, 5).until(
+                    EC.url_contains("ResponsePage")
+                )
+
+                total += 1
+
+                print("✅ Success")
+
+            except:
+
+                print("⚠️ Submitted")
+
+        else:
+
+            print("❌ Failed")
+
+        driver.delete_all_cookies()
+
+    elapsed = time.time() - start_time
+
+    driver.quit()
+
+    print("\n" + "=" * 50)
+
+    print(
+        f"✅ Successful: {total}/{num_submissions}"
+    )
+
+    print(
+        f"⏱️ Time: {elapsed:.2f} seconds"
+    )
+
+    if num_submissions > 0:
+
+        print(
+            f"⚡ Average: {elapsed / num_submissions:.2f} sec"
+        )
+
+    print("=" * 50)
+
+# ============================================
+# START
+# ============================================
+
+if __name__ == "__main__":
+
+    run_automation()
