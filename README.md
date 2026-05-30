@@ -1,122 +1,220 @@
-# Microsoft-Forms-Fill-Bot
-Automate your form submissions effortlessly! This bot fills out forms for you, saves time, and ensures accuracy—perfect for surveys, registrations, and more. Try it now and let the bot do the work!
 
-### Would be very helpfull for Projects
-### If facing any issues! either contact me or *Ask ChaGPT*!
+# Microsoft Forms Auto Filler
 
-# Form Automation Bot
+Automate Microsoft Forms submissions effortlessly using Selenium.  
+This tool fills forms automatically, handles multiple question types, and runs fully headless for fast and efficient automation.
 
-This bot automates form submissions, making it perfect for repetitive tasks like filling out surveys, registrations, or feedback forms. It uses Selenium to interact with web forms, dynamically detects fields, and fills them with random or predefined data. Whether you're testing a form or need to submit multiple entries, this bot saves time and ensures accuracy.
+---
+
+## Overview
+
+This project is a Python-based automation bot built with Selenium.  
+It detects Microsoft Forms questions dynamically and answers them automatically using randomized logic.
+
+It supports:
+- Radio buttons
+- Checkboxes
+- Text inputs
+- Multi-page forms (Next button handling)
+- Auto submission
+- Headless browser execution
 
 ---
 
 ## Features
 
-- **Dynamic Form Detection:** Automatically detects and fills text fields, dropdowns, radio buttons, checkboxes, and more.
-- **Customizable Data:** Randomly generates names, ages, phone types, brands, and other data, or allows you to customize the inputs.
-- **Headless Mode:** Runs in the background without opening a browser window.
-- **Error Handling:** Skips problematic fields and continues filling the form.
-- **Multiple Submissions:** Submits the form multiple times as specified by the user.
-- **Form Reset:** Clears cookies and refreshes the page after each submission to ensure a clean slate.
+- **Smart Question Detection**  
+  Automatically detects Microsoft Forms question containers.
+
+- **Radio Button Automation**  
+  Randomly selects available options.
+
+- **Checkbox Automation**  
+  Selects multiple valid options while avoiding excluded values.
+
+- **Text Input Filling**  
+  Automatically fills text fields and text areas with random responses.
+
+- **Multi-page Navigation**  
+  Automatically clicks "Next" when available.
+
+- **Auto Submit Handling**  
+  Detects and clicks "Submit" when reached.
+
+- **Headless Mode Support**  
+  Runs without opening a visible browser window.
+
+- **Stability Handling**  
+  Handles stale elements and skips broken fields safely.
+
+- **Multiple Submissions Support**  
+  Runs automation multiple times based on user input.
 
 ---
 
 ## Requirements
 
+Before running the bot, ensure:
 
-Before running the bot, ensure you done this
-
-#### -- You Need to CHange Stuff to fit With Your Form 
-#### -- You Need To Remove The Start Now Button Temporary 
-
-![image](https://github.com/user-attachments/assets/fbbfc313-3bcf-4171-be06-33a21ba303e2)
-
-# How to?
-#### Go to The form > Style > LeftTop Layout
-
-![image](https://github.com/user-attachments/assets/8455b0ed-b034-41a9-b4d5-daa8a63c0d98)
-
-### Once You finished, you can return it back!
-
+- You have a working Microsoft Form URL
+- The form structure is compatible with Microsoft Forms layout
+- Firefox is installed
+- Internet connection is active
 
 ---
 
-## Setup
+## Installation
 
-### Step 1: Install Python
+### 1. Install Python
 
-1. **Install Python 3.x**
-   - On Windows/macOS/Linux, download Python from [python.org](https://www.python.org/downloads/).
-   - During installation, ensure you check the box to **Add Python to PATH**.
+Download Python:
+https://www.python.org/downloads/
 
-2. **Verify Installation**
-   - Open a terminal or command prompt and run:
-     ```bash
-     python --version
-     ```
-   - You should see something like `Python 3.x.x`.
+Enable:
+- Add Python to PATH
 
----
-
-### Step 2: Set Up a Virtual Environment (Optional/ If you got enviroment error)
-
-1. **Create a Virtual Environment**
-   - Navigate to your project folder and run:
-     ```bash
-     python -m venv venv
-     ```
-
-2. **Activate the Virtual Environment**
-   - On Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-   - On macOS/Linux:
-     ```bash
-     source venv/bin/activate
+Verify:
+```bash
+python --version
+````
 
 ---
 
-### Step 3: Install Dependencies
+### 2. Install Dependencies
 
-1. **Install Selenium**
-   - Run the following command:
-     ```bash
-     pip install selenium
-     pip install selenium webdriver-manager
-     pip install webdriver-manager     
+Install required packages:
 
-
-     ```
-
-2. **Download Geckodriver**
-   - Download Geckodriver for your operating system:
-     - **Windows:** [geckodriver.exe](https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-win64.zip)
-     - **macOS:** [geckodriver](https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-macos.tar.gz)
-     - **Linux:** [geckodriver](https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz)
-   - Extract the downloaded file and note the path to the `geckodriver` executable.
-
-3. **Install Firefox**
-   - On Windows/macOS/Linux, download and install Firefox from [mozilla.org](https://www.mozilla.org/firefox/).
+```bash
+pip install selenium webdriver-manager
+```
 
 ---
 
-### Step 4: Set Up the Bot
+### 3. Install Firefox
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/Adam-ZS/Microsoft-Forms-Fill-Bot.git
-   cd Microsoft-Forms-Fill-Bot
-   
-Update the Script
+Download Firefox:
+[https://www.mozilla.org/firefox/](https://www.mozilla.org/firefox/)
 
-Open the script (Form.py) in a text editor.
+---
 
-Update the geckodriver_path variable with the path to your Geckodriver executable.
+## How It Works
 
-       geckodriver_path = "/path/to/geckodriver"  # Update this path to yours
-       
-To find yours
+The bot uses:
 
-      sudo find / -name "geckodriver"
+* `webdriver_manager` → Automatically installs GeckoDriver
+* `Firefox WebDriver` → Controls browser
+* `Selenium selectors` → Detects form elements
+* `Random generator` → Fills responses dynamically
+
+---
+
+## Configuration
+
+### Excluded Options
+
+These values will NOT be selected in checkboxes:
+
+```python
+GLOBAL_EXCLUSIONS = [
+    "other",
+    "medical",
+    "__other_option__",
+    "اخرى",
+    "أخرى"
+]
+```
+
+---
+
+### Text Responses Pool
+
+Used for text fields:
+
+```python
+TEXT_RESPONSES = [
+    "Good", "Excellent", "Yes", "No", "N/A",
+    "Perfect", "Okay", "Agree", "Strongly agree",
+    "Everything is fine", "Very good", "Satisfied",
+    "Nice", "Thank you"
+]
+```
+
+---
+
+## Run the Bot
+
+Run the script:
+
+```bash
+python Form.py
+```
+
+---
+
+## Usage
+
+When running:
+
+1. Enter Microsoft Form URL
+2. Enter number of submissions
+3. Bot starts automatically
+
+Example:
+
+```
+Enter Microsoft Form URL: https://forms.office.com/...
+Number of submissions: 10
+```
+
+---
+
+## Output Example
+
+```
+Submission 1/10
+Success
+
+Submission 2/10
+Submitted
+
+Successful: 9/10
+Time: 32.14 seconds
+Average: 3.21 sec
+```
+
+---
+
+## Notes
+
+* Works only with Microsoft Forms structure
+* Some forms may block automation or require adjustments
+* Headless mode is enabled by default
+* Use responsibly for testing purposes only
+
+---
+
+## Troubleshooting
+
+If errors occur:
+
+* Ensure Firefox is installed
+* Update Selenium:
+
+  ```bash
+  pip install --upgrade selenium
+  ```
+* Check form layout compatibility
+* Disable extra form restrictions if needed
+
+---
+
+## Author
+
+Adam-ZS
+
+---
+
+## License
+
+For educational and testing purposes only
 
